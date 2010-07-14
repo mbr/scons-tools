@@ -19,6 +19,7 @@ def generate(env):
 	bld = Builder(action = archive)
 	env.Append(BUILDERS = {'Archive': bld})
 	env.SetDefault(ARCHIVE_ZIP_METHOD = 'ZIP_DEFLATED')
+	env.SetDefault(ARCHIVE_PREFIX = None)
 
 class ZipWriter(object):
 	def __init__(self, env, output_filename):
@@ -58,7 +59,11 @@ def archive(target, source, env):
 	else:
 		raise BuildError(errstr = "Unknown file extension: %s" % target_name)
 
+	target_relname = target[0].get_path()
 	for sourcefile in source:
-		writer.add(sourcefile.get_abspath(), sourcefile.get_path())
+		archive_prefix = env['ARCHIVE_PREFIX'] or ''
+		archive_filename = os.path.join(archive_prefix, sourcefile.get_path())
+		source_filename = sourcefile.get_abspath()
+		writer.add(source_filename, archive_filename)
 
 	writer.finish()
