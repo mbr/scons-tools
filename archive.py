@@ -20,6 +20,7 @@ def generate(env):
 	env.Append(BUILDERS = {'Archive': bld})
 	env.SetDefault(ARCHIVE_ZIP_METHOD = 'ZIP_DEFLATED')
 	env.SetDefault(ARCHIVE_PREFIX = None)
+	env.SetDefault(ARCHIVE_VERBOSE = True)
 
 class ZipWriter(object):
 	def __init__(self, env, output_filename):
@@ -64,6 +65,7 @@ def archive(target, source, env):
 		archive_prefix = env['ARCHIVE_PREFIX'] or ''
 		archive_filename = os.path.join(archive_prefix, sourcefile.get_path())
 		source_filename = sourcefile.get_abspath()
+		if env['ARCHIVE_VERBOSE']: print "%s => %s:%s" % (source_filename, target_relname, archive_filename)
 		writer.add(source_filename, archive_filename)
 
 	writer.finish()
