@@ -3,6 +3,7 @@
 
 from SCons.Script import *
 from SCons.Errors import BuildError
+from SCons import Action
 
 try:
 	import os
@@ -16,7 +17,7 @@ else:
 
 def generate(env):
 	assert(exists(env))
-	bld = Builder(action = archive)
+	bld = Builder(action = Action.Action(archive, archive_string))
 	env.Append(BUILDERS = {'Archive': bld})
 	env.SetDefault(ARCHIVE_ZIP_METHOD = 'ZIP_DEFLATED')
 	env.SetDefault(ARCHIVE_PREFIX = None)
@@ -44,6 +45,9 @@ class TarWriter(object):
 
 	def finish(self):
 		self.tararchive.close()
+
+def archive_string(target, source, env):
+	return "Building %s from %d source files." % (target[0].get_path(), len(source))
 
 def archive(target, source, env):
 	assert(len(target) == 1)
