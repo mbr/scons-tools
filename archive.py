@@ -45,18 +45,18 @@ class TarWriter(object):
 
 def archive(target, source, env):
 	assert(len(target) == 1)
-	archive_name = target[0].get_abspath()
+	target_name = target[0].get_abspath()
 
-	if archive_name.endswith('.zip'):
-		writer = ZipWriter(env, archive_name)
-	elif archive_name.endswith('.tar'):
-		writer = TarWriter(env, archive_name)
-	elif archive_name.endswith('.tar.bz2'):
-		writer = TarWriter(env, archive_name, 'bz2')
-	elif archive_name.endswith('.tar.gz'):
-		writer = TarWriter(env, archive_name, 'gz')
+	if target_name.endswith('.zip'):
+		writer = ZipWriter(env, target_name)
+	elif target_name.endswith('.tar'):
+		writer = TarWriter(env, target_name)
+	elif target_name.endswith('.tar.bz2'):
+		writer = TarWriter(env, target_name, 'bz2')
+	elif target_name.endswith('.tar.gz'):
+		writer = TarWriter(env, target_name, 'gz')
 	else:
-		raise BuildError(errstr = "Unknown file extension: %s" % archive_name)
+		raise BuildError(errstr = "Unknown file extension: %s" % target_name)
 
 	for sourcefile in source:
 		writer.add(sourcefile.get_abspath(), sourcefile.get_path())
