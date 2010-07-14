@@ -5,6 +5,39 @@ from SCons.Script import *
 from SCons.Errors import BuildError
 from SCons import Action
 
+"""
+Scons zip/tar/tar.bz2/tar.gz Builder
+
+This aims at allowing the user to easily create an archive of a few files. It is not meant to replace the
+packaging capabilities of the bundled package builders, but is rather intended to be used in situations where
+you do not want to create a full-fledged package just yet.
+
+A simple example:
+-----------------
+# assuming you have this file in ./scons-tools:
+env = Environment(tools = ['default', 'archive'], toolpath = ['scons-tools'])
+
+  # more stuff declared here ...
+
+# zip up file_1, file_2 and all files named '*.foo' in the subdir 'some_sub_dir' to the
+# archive:
+Alias('release', env.Archive('dist/release-binary.tar.gz',
+                             ['file_1','file_2'] + env.Glob('some_sub_dir/*.foo'))
+     )
+
+Other options:
+--------------
+You can set the following Environment options to affect the behavior of this Tool:
+
+	# example settings, set to defaults here:
+	env['ARCHIVE_ZIP_METHOD'] = 'ZIP_DEFLATED'  # zip method, ZIP_STORED for no compression when
+	                                              using .zip files
+	env.SetDefault(ARCHIVE_PREFIX = None)       # a directory prefix. set to 'foo' and a file
+	                                            # 'some_sub_dir/bar.xy' will be added to the archive
+	                                            # as 'foo/some_sub_dir/bar.xy'
+	env.SetDefault(ARCHIVE_VERBOSE = True)      # print all filenames as they are added
+"""
+
 try:
 	import os
 	import os.path
