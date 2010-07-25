@@ -4,6 +4,7 @@
 from SCons.Script import *
 
 cpu_freq_table = {
+	'atmega128': 7372800,
 	'atmega328p': 16*10**6,
 }
 
