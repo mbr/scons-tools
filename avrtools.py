@@ -29,6 +29,10 @@ def generate(env):
 	env.Append(CFLAGS = archflags,
 			   CXXFLAGS = archflags,
 			   LINKFLAGS = archflags + Split('--gc-sections'))
+
+	# create data and function sections, allowing for later removal of unused functions/data
+	# with --gc-sections
+	env.Append(CFLAGS = Split('-fdata-sections -ffunction-sections -s'))
 	env.Append(CXXFLAGS = '-fno-exceptions')
 	env.Append(CFLAGS = '-Os')
 	env.Append(CFLAGS = '-std=c99')
