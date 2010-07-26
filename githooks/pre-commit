@@ -1,0 +1,36 @@
+#!/bin/sh
+
+umask 077
+
+GITCFG=preflight.command
+
+TMPDIR=
+REPODIR=
+COMPILECMD=`git config $GITCFG`
+
+set -e
+
+if [ "" = "$COMPILECMD" ]; then
+	echo "$GITCFG not set in git config";
+	echo "no pre-flight check done.";
+	exit 0;
+fi;
+
+trap "on_exit" INT TERM EXIT
+
+on_exit() {
+	set +e
+	if [ "$TMPDIR" != "" ]; then
+		rm -r $TMPDIR;
+	fi;
+}
+
+echo -n "Checking out..."
+TMPDIR=`mktemp -d`
+git archive --format=tar `git write-tree` | tar -xC $TMPDIR  -f -
+echo "OK"
+
+echo -n "Running pre-flight check..."
+cd $TMPDIR
+$COMPILECMD
+echo "OK"
