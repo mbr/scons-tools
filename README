@@ -4,6 +4,8 @@ Custom tools/builders for SCons. Each is in a self-contained file, put it into y
 
 You should put the tools file (in this case, `archive.py`) into a subfolder of the directory `SConstruct` resides in called `scons-tools`.
 
+Note: Depending on your distro and scons version, the site_tools directory may reside elsewhere. Check the scons manpage for details.
+
 License
 =======
 Copyright (c) 2010 Marc Brinkmann
