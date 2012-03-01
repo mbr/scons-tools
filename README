@@ -1,5 +1,4 @@
-Custom tools/builders for SCons. Each is in a self-contained file, put it into your `site_scons/site_tools` directory,
-or use code like this:
+Custom tools/builders for SCons. Each is in a self-contained file, put it into your `~/.scons/site_scons/site_tools` directory, or use code like this:
 
      env = Environment(tools = ['default', 'archive'], toolpath = ['scons-tools'])
 
