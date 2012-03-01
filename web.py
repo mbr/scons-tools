@@ -16,7 +16,8 @@ import_re = re.compile('@import\s+' +
 
 
 def less_scan(node, env, path):
-    return env.File(import_re.findall(node.get_text_contents()))
+    imports = import_re.findall(node.get_text_contents())
+    return env.File([node.get_dir().File(fn) for fn in imports])
 
 
 def generate(env):
