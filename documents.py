@@ -26,10 +26,20 @@ def generate(env):
     # concatenates PDF files using pdftk
     pdf_merge = Builder(action = 'pdftk $SOURCES cat output $TARGET')
 
+    rst_to_html = Builder(action = ' '.join(
+                          ['rst2html',
+                           '--strict',
+                           '--math-output=MathJax',
+                           '< $SOURCE',
+                           '> $TARGET']),
+                          suffix = '.html',
+                          src_suffix = '.rst')
+
     env.Append(BUILDERS={
         'PDFMerge': pdf_merge,
         'ImgToPDF': img_to_pdf,
         'SVGToPDF': svg_to_pdf,
+        'RSTToHTML': rst_to_html,
     })
 
 
