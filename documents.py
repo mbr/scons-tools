@@ -30,8 +30,8 @@ def generate(env):
                           ['rst2html',
                            '--strict',
                            '--math-output=MathJax',
-                           '< $SOURCE',
-                           '> $TARGET']),
+                           '$SOURCE',
+                           '$TARGET']),
                           suffix = '.html',
                           src_suffix = '.rst')
 
