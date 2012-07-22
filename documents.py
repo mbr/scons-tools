@@ -50,8 +50,8 @@ def generate(env):
         'PDFMerge': pdf_merge,
         'ImgToPDF': img_to_pdf,
         'SVGToPDF': svg_to_pdf,
-        'RSTToHTML': rst_to_html,
-        'RSTToLatex': rst_to_latex,
+        'RST2HTML': rst_to_html,
+        'RST2Latex': rst_to_latex,
     })
 
 
