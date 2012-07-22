@@ -36,11 +36,22 @@ def generate(env):
                           suffix='.html',
                           src_suffix='.rst')
 
+    rst_to_latex = Builder(action=' '.join(
+                           ['rst2latex',
+                            '--strict',
+                            '--stylesheet=amsfonts,amssymb',
+                            '$SOURCE',
+                            '$TARGET',
+                           ]),
+                           suffix='.latex',
+                           src_suffix='.rst')
+
     env.Append(BUILDERS={
         'PDFMerge': pdf_merge,
         'ImgToPDF': img_to_pdf,
         'SVGToPDF': svg_to_pdf,
         'RSTToHTML': rst_to_html,
+        'RSTToLatex': rst_to_latex,
     })
 
 
