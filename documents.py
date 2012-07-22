@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # coding=utf8
 
-from SCons.Script import *
+from SCons.Script import Builder
 
 # 150 dpi, a4 (210mm x 297mm)
 a4_dim_px = (1240, 1754)
 
+
 def generate(env):
     # converts a JPEG with the right aspect ration to an A4 PDF page
-    img_to_pdf = Builder(action = ' '.join(
+    img_to_pdf = Builder(action=' '.join(
                         ['convert', '$SOURCE',
                          '-units', 'PixelsPerInch',
                          '-density', '150',
@@ -17,23 +18,23 @@ def generate(env):
                          '$TARGET']))
 
     # converts an SVG to PDF using inkscape
-    svg_to_pdf = Builder(action = ' '.join(
+    svg_to_pdf = Builder(action=' '.join(
                         ['inkscape',
                          '--export-area-page',
                          '--export-pdf=$TARGET',
                          '$SOURCE']))
 
     # concatenates PDF files using pdftk
-    pdf_merge = Builder(action = 'pdftk $SOURCES cat output $TARGET')
+    pdf_merge = Builder(action='pdftk $SOURCES cat output $TARGET')
 
-    rst_to_html = Builder(action = ' '.join(
+    rst_to_html = Builder(action=' '.join(
                           ['rst2html',
                            '--strict',
                            '--math-output=MathJax',
                            '$SOURCE',
                            '$TARGET']),
-                          suffix = '.html',
-                          src_suffix = '.rst')
+                          suffix='.html',
+                          src_suffix='.rst')
 
     env.Append(BUILDERS={
         'PDFMerge': pdf_merge,
