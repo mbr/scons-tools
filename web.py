@@ -27,8 +27,17 @@ import_re = re.compile('@import\s+' +
 
 
 def less_scan(node, env, path):
-    imports = import_re.findall(node.get_text_contents())
-    return env.File([node.get_dir().File(fn) for fn in imports])
+    include_path = (node.get_dir(),) + tuple(path)
+    result = []
+    for fn in import_re.findall(node.get_text_contents()):
+        n = SCons.Node.FS.find_file(fn, include_path)
+        if n == None:
+            result.append(env.File(fn))
+            # should trigger a 'not found'
+        else:
+            result.append(n)
+
+    return result
 
 
 def dart2js_scan(node, env, path):
