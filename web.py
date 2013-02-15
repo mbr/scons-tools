@@ -68,12 +68,22 @@ less_builder = Builder(action='lessc $SOURCE $TARGET',
                        src_suffix='.less')
 
 
+recess_builder = Builder(action='recess --compile $SOURCE > $TARGET',
+                         suffix='.css',
+                         src_suffic='.less')
+recess_min_builder = Builder(action='recess --compress $SOURCE > $TARGET',
+                         suffix='.min.css',
+                         src_suffic='.less')
+
+
 less_scanner = Scanner(function=less_scan, skeys=['.less'])
 
 
 def generate(env):
     env.Append(BUILDERS={'less': less_builder,
-                         'Dart2Js': dart2js_builder},
+                         'Dart2Js': dart2js_builder,
+                         'recess': recess_builder,
+                         'recess_min': recess_min_builder},
                SCANNERS=[less_scanner, dart2js_scanner])
 
 
