@@ -63,6 +63,29 @@ def dart_emitter(target, source, env):
     return target, source
 
 
+def lessc_generator(source, target, env, for_signature):
+    cmd = ['lessc']
+
+    if env['LESS_INCLUDE_PATH']:
+        cmd.append('--include-path="%s"' %
+                   os.pathsep.join(env['LESS_INCLUDE_PATH']))
+
+    if env['LESS_COMPRESS']:
+        if env['LESS_YUI_COMPRESS']:
+            cmd.append('--yui-compress')
+        else:
+            cmd.append('--compress')
+
+    if env['LESS_STRICT_IMPORTS']:
+        cmd.append('--strict-imports')
+
+
+    cmd.append('"%s"' % source[0])
+    cmd.append('"%s"' % target[0])
+
+    return ' '.join(cmd)
+
+
 dart2js_builder = Builder(action='dart2js -c $SOURCE -o$TARGET',
                           suffix='.dart.js',
                           src_suffix='.dart',
@@ -72,7 +95,7 @@ dart2js_scanner = Scanner(function=dart2js_scan,
                           skeys=['.dart'])
 
 
-less_builder = Builder(action='lessc $SOURCE $TARGET',
+less_builder = Builder(generator=lessc_generator,
                        suffix='.css',
                        src_suffix='.less')
 
@@ -85,7 +108,9 @@ recess_min_builder = Builder(action='recess --compress $SOURCE > $TARGET',
                          src_suffic='.less')
 
 
-less_scanner = Scanner(function=less_scan, skeys=['.less'])
+less_scanner = Scanner(function=less_scan, skeys=['.less'],
+                       path_function=FindPathDirs('LESS_INCLUDE_PATH'),
+                       recursive=True)
 
 
 def generate(env):
@@ -94,6 +119,10 @@ def generate(env):
                          'recess': recess_builder,
                          'recess_min': recess_min_builder},
                SCANNERS=[less_scanner, dart2js_scanner])
+    env.SetDefault(LESS_INCLUDE_PATH=[])
+    env.SetDefault(LESS_COMPRESS=True)
+    env.SetDefault(LESS_YUI_COMPRESS=False)
+    env.SetDefault(LESS_STRICT_IMPORTS=True)
 
 
 def exists(env):
