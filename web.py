@@ -147,7 +147,8 @@ def dart_emitter(target, source, env):
 BUILDERS['Dart2Js'] = Builder(action='dart2js -c $SOURCE -o$TARGET',
                               suffix='.dart.js',
                               src_suffix='.dart',
-                              emitter=dart_emitter)
+                              emitter=dart_emitter,
+                              single_source=True)
 
 
 def lessc_generator(source, target, env, for_signature):
@@ -185,7 +186,8 @@ def lessc_generator(source, target, env, for_signature):
 
 BUILDERS['Less'] = Builder(generator=lessc_generator,
                            suffix='.css',
-                           src_suffix='.less')
+                           src_suffix='.less',
+                           single_source=True)
 DEFAULTS['LESS_COMPILER'] = 'lessc'
 DEFAULTS['LESS_INCLUDE_PATH'] = []
 DEFAULTS['LESS_COMPRESS'] = True
