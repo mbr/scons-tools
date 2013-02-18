@@ -214,6 +214,42 @@ DEFAULTS['COFFEE_ROOT'] = Dir('.')
 DEFAULTS['COFFEE_BARE'] = False
 
 
+def uglifyjs_generator(source, target, env, for_signature):
+    cmd = ['uglifyjs']
+
+    # input needs to go in front
+    cmd.extend('"%s"' % src for src in source)
+
+    if env['UGLIFY_COMMENTS']:
+        cmd.append('--comments')
+        cmd.append(env['UGLIFY_COMMENTS'])
+
+    if env['UGLIFY_COMPRESS']:
+        cmd.append('--compress')
+
+    if env['UGLIFY_COMPRESS']:
+        cmd.append('--mangle')
+
+    if env['UGLIFY_BEAUTIFY']:
+        cmd.append('--beautify')
+
+    if env['UGLIFY_LINT']:
+        cmd.append('--lint')
+
+    cmd.append('-o "%s"' % target[0])
+
+    return ' '.join(cmd)
+
+BUILDERS['UglifyJs'] = Builder(generator=uglifyjs_generator,
+                               suffix='.min.js', src_suffic='.js')
+DEFAULTS['UGLIFY_COMMENTS'] = None
+DEFAULTS['UGLIFY_COMPRESS'] = True
+DEFAULTS['UGLIFY_MANGLE'] = True
+DEFAULTS['UGLIFY_BEAUTIFY'] = False
+DEFAULTS['UGLIFY_LINT'] = False
+
+
+
 def generate(env):
     env.Append(BUILDERS=BUILDERS, SCANNERS=SCANNERS)
     env.SetDefault(**DEFAULTS)
