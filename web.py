@@ -198,17 +198,20 @@ DEFAULTS['LESS_STRICT_IMPORTS'] = True
 
 def coffee_generator(source, target, env, for_signature):
     cmd = ['coffee']
-    cmd.append('-s')
     cmd.append('-c')
+    cmd.append('-p')
 
-    cmd.append('< "%s"' % source[0])
+    if env['COFFEE_BARE']:
+        cmd.append('-b')
+
+    cmd.extend('"%s"' % src for src in source)
     cmd.append('> "%s"' % target[0])
     return ' '.join(cmd)
 
 BUILDERS['Coffee'] = Builder(generator=coffee_generator,
-                             suffix='.js', src_suffix='.coffee',
-                             single_source=True)
+                             suffix='.js', src_suffix='.coffee')
 DEFAULTS['COFFEE_ROOT'] = Dir('.')
+DEFAULTS['COFFEE_BARE'] = False
 
 
 def generate(env):
