@@ -36,16 +36,13 @@ LESS_IMPORT_RE = re.compile('@import\s+' +
 
 def less_scan(node, env, path):
     include_path = (node.get_dir(),) + tuple(path)
-    result = []
     for fn in LESS_IMPORT_RE.findall(node.get_text_contents()):
         n = SCons.Node.FS.find_file(fn, include_path)
         if n == None:
-            result.append(env.File(fn))
+            yield env.File(fn)
             # should trigger a 'not found'
         else:
-            result.append(n)
-
-    return result
+            yield n
 
 SCANNERS.append(Scanner(function=less_scan, skeys=['.less'],
                         path_function=FindPathDirs('LESS_INCLUDE_PATH'),
@@ -55,7 +52,6 @@ SCANNERS.append(Scanner(function=less_scan, skeys=['.less'],
 def dart2js_scan(node, env, path):
     deps_fn = str(node) + '.js.deps'
     if os.path.exists(deps_fn):
-        dependencies = []
         with open(deps_fn) as deps_file:
             for line in deps_file:
                 o = urlparse(line.strip())
@@ -64,9 +60,7 @@ def dart2js_scan(node, env, path):
                                         'Cannot handle dependency "%s"' % line)
                     continue
 
-                dependencies.append(env.File(o.path))
-        return dependencies
-    return []
+                yield env.File(o.path)
 
 SCANNERS.append(Scanner(function=dart2js_scan,
                         skeys=['.dart']))
