@@ -130,6 +130,13 @@ DEFAULTS['LESS_INCLUDE_PATH'] = []
 DEFAULTS['LESS_COMPRESS'] = True
 DEFAULTS['LESS_YUI_COMPRESS'] = False
 DEFAULTS['LESS_STRICT_IMPORTS'] = True
+# note: could use lessc for compiling and recess for compression to support
+#       build a "real" bootstrap
+# note: could support .min.css using emitters?
+# note: could support a path for the compiler binary (to allow non-standard
+#       compiler forks)
+# note: could do away with LESS_YUI_COMPRESS and add a generic LESS_COMPRESSOR
+#       option, see first note
 
 
 def generate(env):
