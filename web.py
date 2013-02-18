@@ -72,6 +72,67 @@ SCANNERS.append(Scanner(function=dart2js_scan,
                         skeys=['.dart']))
 
 
+# coffee-script code MIT-licensed, originally written by Joe Koberg
+# altered by Marc Brinkmann
+COFFEE_REQUIRE_PATTERNS = [
+    re.compile(pattern, re.MULTILINE)
+    for pattern in [
+        r"""require\s*\(*\s*['"]([^.].*?)['"]\)*""",
+        r"""require\s*\(*\s*['"](\./.*?)['"]\)*""",
+        r"""require\s*\(*\s*['"](\.\./.*?)['"]\)*""",
+        ]
+    ]
+
+COFFEE_DEFINE_PATTERNS = [
+    re.compile(pattern, re.MULTILINE)
+    for pattern in [
+        r"""define\s*\(*\s*\[(.+?)\]""",
+        r"""require\s*\(*\s*\[(.+?)\]""",
+        ]
+    ]
+
+def coffee_glob_requirement_name(env, node, name):
+    if not name.startswith('_'):
+        if name.endswith('.js'):
+            # suffixed files are located relative to the script calling require()
+            # that seems wrong. Suffixed files are located relative to root???
+            #req = node.File(name)
+            yield env['COFFEEROOT'].File(name)
+        else:
+            # non-suffixed files are located relative to html containing data-main
+            # Also seems wrong. They are located relative to the SCRIPT mentioned in data-main
+            coffee_file = node.File(name+'.coffee')
+            if coffee_file.exists():
+                # build the required JS file from the coffescript source
+                reqs = env.Coffeescript(source=coffee_file)
+                for req in reqs:
+                    yield req
+            else:
+                # if no .coffee to compile, depend on a raw .js
+                yield node.File(name+'.js')
+
+
+def coffee_scan(node, env, path):
+    contents = node.get_text_contents()
+    requirements = []
+
+    for pattern in COFFEE_REQUIRE_PATTERNS:
+        for match in pattern.finditer(contents):
+            requirement = match.group(1)
+            for found in coffee_glob_requirement_name(env, node, requirement):
+                yield found
+
+    for pattern in COFFEE_DEFINE_PATTERNS:
+        for match in pattern.finditer(contents):
+            define_strings = [s.strip().strip('"\'') for s in match.group(1).split(',')]
+            for requirement in define_strings:
+                for found in coffee_glob_requirement_name(env, node, requirement):
+                    yield found
+SCANNERS.append(env.Scanner(function = coffee_scan_func,
+                            skeys = ['.coffee', '.js']))
+
+
+
 #################################################
 # BUILDERS
 #################################################
@@ -137,6 +198,15 @@ DEFAULTS['LESS_STRICT_IMPORTS'] = True
 #       compiler forks)
 # note: could do away with LESS_YUI_COMPRESS and add a generic LESS_COMPRESSOR
 #       option, see first note
+
+
+# coffee-script code MIT-licensed, originally written by Joe Koberg
+# altered by Marc Brinkmann
+BUILDERS['Coffee'] = Builder(action='coffee -cs  < $$SOURCE > $$TARGET',
+                             suffix='.js', src_suffix='.coffee',
+                             single_source = True,
+                             source_scanner = coffee_scan)
+DEFAULTS['COFFEEROOT'] = Dir('.')
 
 
 def generate(env):
