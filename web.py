@@ -90,21 +90,32 @@ BUILDERS['Dart2Js'] = Builder(action='dart2js -c $SOURCE -o$TARGET',
 
 
 def lessc_generator(source, target, env, for_signature):
-    cmd = ['lessc']
+    if not env['LESS_COMPILER'] in ('lessc', 'recess'):
+        raise Error('Less compiler %s not known' % env['LESS_COMPILER'])
+
+    cmd = [env['LESS_COMPILER']]
 
     if env['LESS_INCLUDE_PATH']:
+        if env['LESS_COMPILER'] not in ('lessc',):
+            raise Error('Compiler %s does not support include paths.' %
+                        env['LESS_COMPILER'])
         cmd.append('--include-path="%s"' %
                    os.pathsep.join(env['LESS_INCLUDE_PATH']))
 
     if env['LESS_COMPRESS']:
         if env['LESS_YUI_COMPRESS']:
+            if env['LESS_COMPILER'] not in ('lessc',):
+                raise Error('Compiler %s does not support YUI-compress.' %
+                            env['LESS_COMPILER'])
             cmd.append('--yui-compress')
         else:
             cmd.append('--compress')
 
     if env['LESS_STRICT_IMPORTS']:
+        if env['LESS_COMPILER'] not in ('lessc',):
+            raise Error('Compiler %s does not support strict imports.' %
+                        env['LESS_COMPILER'])
         cmd.append('--strict-imports')
-
 
     cmd.append('"%s"' % source[0])
     cmd.append('"%s"' % target[0])
@@ -114,18 +125,11 @@ def lessc_generator(source, target, env, for_signature):
 BUILDERS['Less'] = Builder(generator=lessc_generator,
                            suffix='.css',
                            src_suffix='.less')
+DEFAULTS['LESS_COMPILER'] = 'lessc'
 DEFAULTS['LESS_INCLUDE_PATH'] = []
 DEFAULTS['LESS_COMPRESS'] = True
 DEFAULTS['LESS_YUI_COMPRESS'] = False
 DEFAULTS['LESS_STRICT_IMPORTS'] = True
-
-
-#recess_builder = Builder(action='recess --compile $SOURCE > $TARGET',
-#                         suffix='.css',
-#                         src_suffic='.less')
-#recess_min_builder = Builder(action='recess --compress $SOURCE > $TARGET',
-#                         suffix='.min.css',
-#                         src_suffic='.less')
 
 
 def generate(env):
