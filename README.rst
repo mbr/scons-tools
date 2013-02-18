@@ -1,6 +1,6 @@
-Custom tools/builders for SCons. Each is in a self-contained file, put it into your `~/.scons/site_scons/site_tools` directory, or use code like this:
+Custom tools/builders for SCons. Each is in a self-contained file, put it into your `~/.scons/site_scons/site_tools` directory, or use code like this::
 
-     env = Environment(tools = ['default', 'archive'], toolpath = ['scons-tools'])
+  env = Environment(tools = ['default', 'archive'], toolpath = ['scons-tools'])
 
 You should put the tools file (in this case, `archive.py`) into a subfolder of the directory `SConstruct` resides in called `scons-tools`.
 
