@@ -91,7 +91,7 @@ def coffee_glob_requirement_name(env, node, name):
             # suffixed files are located relative to the script calling require()
             # that seems wrong. Suffixed files are located relative to root???
             #req = node.File(name)
-            yield env['COFFEEROOT'].File(name)
+            yield env['COFFEE_ROOT'].File(name)
         else:
             # non-suffixed files are located relative to html containing data-main
             # Also seems wrong. They are located relative to the SCRIPT mentioned in data-main
@@ -196,12 +196,19 @@ DEFAULTS['LESS_STRICT_IMPORTS'] = True
 #       option, see first note
 
 
-# coffee-script code MIT-licensed, originally written by Joe Koberg
-# altered by Marc Brinkmann
-BUILDERS['Coffee'] = Builder(action='coffee -sc < $SOURCE > $TARGET',
+def coffee_generator(source, target, env, for_signature):
+    cmd = ['coffee']
+    cmd.append('-s')
+    cmd.append('-c')
+
+    cmd.append('< "%s"' % source[0])
+    cmd.append('> "%s"' % target[0])
+    return ' '.join(cmd)
+
+BUILDERS['Coffee'] = Builder(generator=coffee_generator,
                              suffix='.js', src_suffix='.coffee',
                              single_source=True)
-DEFAULTS['COFFEEROOT'] = Dir('.')
+DEFAULTS['COFFEE_ROOT'] = Dir('.')
 
 
 def generate(env):
