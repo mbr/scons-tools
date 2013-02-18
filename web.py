@@ -206,8 +206,7 @@ DEFAULTS['LESS_STRICT_IMPORTS'] = True
 # altered by Marc Brinkmann
 BUILDERS['Coffee'] = Builder(action='coffee -c $SOURCE > $TARGET',
                              suffix='.js', src_suffix='.coffee',
-                             single_source = True,
-                             source_scanner = coffee_scan)
+                             single_source=True)
 DEFAULTS['COFFEEROOT'] = Dir('.')
 
 
