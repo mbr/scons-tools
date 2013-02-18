@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # coding=utf8
 
-"""Builders for common generated web files"""
+"""Builders for common generated web files.
+
+Supports building of LESS, Dart and CoffeeScript files.
+"""
 
 import os
 import re
@@ -18,18 +21,23 @@ class UnknownDependencyWarning(SCons.Warnings.Warning):
 SCons.Warnings.enableWarningClass(UnknownDependencyWarning)
 
 
+#################################################
+# SCANNERS
+#################################################
+SCANNERS = []
+
 # note: this is far from accurate or correct,
 #       but should handle 99% of the common cases
-import_re = re.compile('@import\s+' +
-                       '(?:url\()?' +
-                       """["']([^'"]*)["']""" +
-                       '\s*;')
+LESS_IMPORT_RE = re.compile('@import\s+' +
+                            '(?:url\()?' +
+                            """["']([^'"]*)["']""" +
+                            '\s*;')
 
 
 def less_scan(node, env, path):
     include_path = (node.get_dir(),) + tuple(path)
     result = []
-    for fn in import_re.findall(node.get_text_contents()):
+    for fn in LESS_IMPORT_RE.findall(node.get_text_contents()):
         n = SCons.Node.FS.find_file(fn, include_path)
         if n == None:
             result.append(env.File(fn))
@@ -38,6 +46,10 @@ def less_scan(node, env, path):
             result.append(n)
 
     return result
+
+SCANNERS.append(Scanner(function=less_scan, skeys=['.less'],
+                        path_function=FindPathDirs('LESS_INCLUDE_PATH'),
+                        recursive=True))
 
 
 def dart2js_scan(node, env, path):
@@ -56,11 +68,25 @@ def dart2js_scan(node, env, path):
         return dependencies
     return []
 
+SCANNERS.append(Scanner(function=dart2js_scan,
+                        skeys=['.dart']))
+
+
+#################################################
+# BUILDERS
+#################################################
+BUILDERS = {}
+DEFAULTS = {}
 
 def dart_emitter(target, source, env):
     target.append(str(target[0]) + '.deps')
     target.append(str(target[0]) + '.map')
     return target, source
+
+BUILDERS['Dart2Js'] = Builder(action='dart2js -c $SOURCE -o$TARGET',
+                              suffix='.dart.js',
+                              src_suffix='.dart',
+                              emitter=dart_emitter)
 
 
 def lessc_generator(source, target, env, for_signature):
@@ -85,44 +111,26 @@ def lessc_generator(source, target, env, for_signature):
 
     return ' '.join(cmd)
 
-
-dart2js_builder = Builder(action='dart2js -c $SOURCE -o$TARGET',
-                          suffix='.dart.js',
-                          src_suffix='.dart',
-                          emitter=dart_emitter)
-
-dart2js_scanner = Scanner(function=dart2js_scan,
-                          skeys=['.dart'])
-
-
-less_builder = Builder(generator=lessc_generator,
-                       suffix='.css',
-                       src_suffix='.less')
+BUILDERS['Less'] = Builder(generator=lessc_generator,
+                           suffix='.css',
+                           src_suffix='.less')
+DEFAULTS['LESS_INCLUDE_PATH'] = []
+DEFAULTS['LESS_COMPRESS'] = True
+DEFAULTS['LESS_YUI_COMPRESS'] = False
+DEFAULTS['LESS_STRICT_IMPORTS'] = True
 
 
-recess_builder = Builder(action='recess --compile $SOURCE > $TARGET',
-                         suffix='.css',
-                         src_suffic='.less')
-recess_min_builder = Builder(action='recess --compress $SOURCE > $TARGET',
-                         suffix='.min.css',
-                         src_suffic='.less')
-
-
-less_scanner = Scanner(function=less_scan, skeys=['.less'],
-                       path_function=FindPathDirs('LESS_INCLUDE_PATH'),
-                       recursive=True)
+#recess_builder = Builder(action='recess --compile $SOURCE > $TARGET',
+#                         suffix='.css',
+#                         src_suffic='.less')
+#recess_min_builder = Builder(action='recess --compress $SOURCE > $TARGET',
+#                         suffix='.min.css',
+#                         src_suffic='.less')
 
 
 def generate(env):
-    env.Append(BUILDERS={'less': less_builder,
-                         'Dart2Js': dart2js_builder,
-                         'recess': recess_builder,
-                         'recess_min': recess_min_builder},
-               SCANNERS=[less_scanner, dart2js_scanner])
-    env.SetDefault(LESS_INCLUDE_PATH=[])
-    env.SetDefault(LESS_COMPRESS=True)
-    env.SetDefault(LESS_YUI_COMPRESS=False)
-    env.SetDefault(LESS_STRICT_IMPORTS=True)
+    env.Append(BUILDERS=BUILDERS, SCANNERS=SCANNERS)
+    env.SetDefault(**DEFAULTS)
 
 
 def exists(env):
