@@ -122,8 +122,8 @@ def coffee_scan(node, env, path):
             for requirement in define_strings:
                 for found in coffee_glob_requirement_name(env, node, requirement):
                     yield found
-SCANNERS.append(env.Scanner(function = coffee_scan_func,
-                            skeys = ['.coffee', '.js']))
+SCANNERS.append(Scanner(function = coffee_scan,
+                        skeys = ['.coffee', '.js']))
 
 
 
