@@ -202,7 +202,7 @@ DEFAULTS['LESS_STRICT_IMPORTS'] = True
 
 # coffee-script code MIT-licensed, originally written by Joe Koberg
 # altered by Marc Brinkmann
-BUILDERS['Coffee'] = Builder(action='coffee -cs  < $$SOURCE > $$TARGET',
+BUILDERS['Coffee'] = Builder(action='coffee -c $SOURCE > $TARGET',
                              suffix='.js', src_suffix='.coffee',
                              single_source = True,
                              source_scanner = coffee_scan)
