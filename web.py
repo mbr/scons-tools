@@ -256,6 +256,8 @@ def closure_generator(source, target, env, for_signature):
         cmd.append('--compilation_level')
         cmd.append(env['CLOSURE_COMPILATION_LEVEL'])
 
+    cmd.extend(env['CLOSURE_FLAGS'])
+
     cmd.append('--js_output_file "%s"' % target[0])
     cmd.extend('--js "%s"' % src for src in source)
 
@@ -267,7 +269,7 @@ BUILDERS['Closure'] = Builder(generator=closure_generator,
 DEFAULTS['CLOSURE_JAVA_CMD'] = 'java'
 DEFAULTS['CLOSURE_COMPILER_JAR'] = 'compiler.jar'
 DEFAULTS['CLOSURE_COMPILATION_LEVEL'] = 'ADVANCED_OPTIMIZATIONS'
-
+DEFAULTS['CLOSURE_FLAGS'] = []
 
 
 def generate(env):
