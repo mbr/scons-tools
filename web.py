@@ -21,6 +21,16 @@ class UnknownDependencyWarning(SCons.Warnings.Warning):
 SCons.Warnings.enableWarningClass(UnknownDependencyWarning)
 
 
+def get_jar(env, jarname):
+    if jarname in env:
+        return env.get(jarname)
+
+    if jarname in env['ENV']:
+        return env['ENV'][jarname]
+
+    raise KeyError('Please set %s on the environment' % jarname)
+
+
 #################################################
 # SCANNERS
 #################################################
@@ -250,7 +260,7 @@ DEFAULTS['UGLIFY_LINT'] = False
 
 
 def closure_generator(source, target, env, for_signature):
-    cmd = [env['JAVA'], '-jar', env['CLOSURE_COMPILER_JAR']]
+    cmd = [env['JAVA'], '-jar', get_jar(env, 'CLOSURE_COMPILER_JAR')]
 
     if env['CLOSURE_COMPILATION_LEVEL']:
         cmd.append('--compilation_level')
@@ -266,13 +276,12 @@ def closure_generator(source, target, env, for_signature):
 BUILDERS['Closure'] = Builder(generator=closure_generator,
                                 suffix='.min.js', src_suffic='.js')
 
-DEFAULTS['CLOSURE_COMPILER_JAR'] = 'compiler.jar'
 DEFAULTS['CLOSURE_COMPILATION_LEVEL'] = 'ADVANCED_OPTIMIZATIONS'
 DEFAULTS['CLOSURE_FLAGS'] = []
 
 
 def htmlcomp_generator(source, target, env, for_signature):
-    cmd = [env['JAVA'], '-jar', env['HTMLCOMP_COMPRESSOR_JAR']]
+    cmd = [env['JAVA'], '-jar', get_jar(env, 'HTMLCOMP_COMPRESSOR_JAR')]
 
     opt_level_trans = {
         'WHITESPACE_ONLY': 'whitespace',
@@ -344,7 +353,6 @@ BUILDERS['HtmlComp'] = Builder(generator=htmlcomp_generator,
                                single_source=True)
 
 DEFAULTS['JAVA'] = 'java'
-DEFAULTS['HTMLCOMP_COMPRESSOR_JAR'] = 'htmlcompressor.jar'
 DEFAULTS['HTMLCOMP_AGGRESSIVE'] = True
 
 DEFAULTS['HTMLCOMP_AGGRESSIVE_OPTIONS'] = {
