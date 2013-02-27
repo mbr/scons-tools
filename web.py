@@ -347,6 +347,9 @@ def htmlcomp_generator(source, target, env, for_signature):
             cmd.append(opt_level_trans.get(env['CLOSURE_COMPILATION_LEVEL'],
                        'simple'))
 
+        if get_opt('HTMLCOMP_COMPRESS_CSS') == 'yui':
+            cmd.append('--compress-css')
+
     cmd.append('"%s"' % source[0])
     cmd.append('-o "%s"' % target[0])
 
@@ -367,6 +370,7 @@ DEFAULTS['HTMLCOMP_AGGRESSIVE_OPTIONS'] = {
     'HTMLCOMP_PRESERVE_BOOL_ATTRS': False,
     'HTMLCOMP_PRESERVE_JS_PROTOCOL': False,
     'HTMLCOMP_COMPRESS_JS': 'closure',
+    'HTMLCOMP_COMPRESS_CSS': 'yui',
 }
 
 DEFAULTS['HTMLCOMP_SAFE_OPTIONS'] = {
@@ -377,6 +381,7 @@ DEFAULTS['HTMLCOMP_SAFE_OPTIONS'] = {
     'HTMLCOMP_PRESERVE_BOOL_ATTRS': True,
     'HTMLCOMP_PRESERVE_JS_PROTOCOL': True,
     'HTMLCOMP_COMPRESS_JS': False,
+    'HTMLCOMP_COMPRESS_CSS': False,
 }
 
 DEFAULTS['HTMLCOMP_CHARSET'] = None
@@ -391,6 +396,7 @@ DEFAULTS['HTMLCOMP_PRESERVE_TYPE_ATTRS'] = None
 DEFAULTS['HTMLCOMP_PRESERVE_BOOL_ATTRS'] = None
 DEFAULTS['HTMLCOMP_PRESERVE_JS_PROTOCOL'] = None
 DEFAULTS['HTMLCOMP_COMPRESS_JS'] = None
+DEFAULTS['HTMLCOMP_COMPRESS_CSS'] = None
 
 def generate(env):
     env.Append(BUILDERS=BUILDERS, SCANNERS=SCANNERS)
