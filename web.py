@@ -339,9 +339,13 @@ def htmlcomp_generator(source, target, env, for_signature):
         if not get_opt('HTMLCOMP_PRESERVE_JS_PROTOCOL'):
             cmd.append('--remove-js-protocol')
 
-    cmd.append('--closure-opt-level')
-    cmd.append(opt_level_trans.get(env['CLOSURE_COMPILATION_LEVEL'],
-               'simple'))
+        if get_opt('HTMLCOMP_COMPRESS_JS') == 'yui':
+            cmd.extend(('--compress-js', '--js-compressor', 'yui'))
+        elif get_opt('HTMLCOMP_COMPRESS_JS') == 'closure':
+            cmd.extend(('--compress-js', '--js-compressor', 'closure'))
+            cmd.append('--closure-opt-level')
+            cmd.append(opt_level_trans.get(env['CLOSURE_COMPILATION_LEVEL'],
+                       'simple'))
 
     cmd.append('"%s"' % source[0])
     cmd.append('-o "%s"' % target[0])
@@ -362,6 +366,7 @@ DEFAULTS['HTMLCOMP_AGGRESSIVE_OPTIONS'] = {
     'HTMLCOMP_PRESERVE_TYPE_ATTRS': False,
     'HTMLCOMP_PRESERVE_BOOL_ATTRS': False,
     'HTMLCOMP_PRESERVE_JS_PROTOCOL': False,
+    'HTMLCOMP_COMPRESS_JS': 'closure',
 }
 
 DEFAULTS['HTMLCOMP_SAFE_OPTIONS'] = {
@@ -371,6 +376,7 @@ DEFAULTS['HTMLCOMP_SAFE_OPTIONS'] = {
     'HTMLCOMP_PRESERVE_TYPE_ATTRS': True,
     'HTMLCOMP_PRESERVE_BOOL_ATTRS': True,
     'HTMLCOMP_PRESERVE_JS_PROTOCOL': True,
+    'HTMLCOMP_COMPRESS_JS': False,
 }
 
 DEFAULTS['HTMLCOMP_CHARSET'] = None
@@ -384,6 +390,7 @@ DEFAULTS['HTMLCOMP_PRESERVE_DOCTYPE'] = None
 DEFAULTS['HTMLCOMP_PRESERVE_TYPE_ATTRS'] = None
 DEFAULTS['HTMLCOMP_PRESERVE_BOOL_ATTRS'] = None
 DEFAULTS['HTMLCOMP_PRESERVE_JS_PROTOCOL'] = None
+DEFAULTS['HTMLCOMP_COMPRESS_JS'] = None
 
 def generate(env):
     env.Append(BUILDERS=BUILDERS, SCANNERS=SCANNERS)
