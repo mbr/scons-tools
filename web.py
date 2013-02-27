@@ -266,11 +266,116 @@ def closure_generator(source, target, env, for_signature):
 BUILDERS['Closure'] = Builder(generator=closure_generator,
                                 suffix='.min.js', src_suffic='.js')
 
-DEFAULTS['CLOSURE_JAVA_CMD'] = 'java'
 DEFAULTS['CLOSURE_COMPILER_JAR'] = 'compiler.jar'
 DEFAULTS['CLOSURE_COMPILATION_LEVEL'] = 'ADVANCED_OPTIMIZATIONS'
 DEFAULTS['CLOSURE_FLAGS'] = []
 
+
+def htmlcomp_generator(source, target, env, for_signature):
+    cmd = [env['JAVA'], '-jar', env['HTMLCOMP_COMPRESSOR_JAR']]
+
+    opt_level_trans = {
+        'WHITESPACE_ONLY': 'whitespace',
+        'SIMPLE_OPTIMIZATIONS': 'simple',
+        'ADVANCED_OPTIMIZATIONS': 'advanced',
+    }
+
+    is_xml = str(target[0]).endswith('.xml')
+
+    def_opt_set = env['HTMLCOMP_AGGRESSIVE_OPTIONS']\
+                  if env['HTMLCOMP_AGGRESSIVE'] else\
+                  env['HTMLCOMP_SAFE_OPTIONS']
+
+    def get_opt(name):
+        val = env[name]
+
+        if val == None:
+            return def_opt_set[name]
+
+    if env['HTMLCOMP_CHARSET']:
+        cmd.append('--charset')
+        cmd.append(env['HTML_CHARSET'])
+
+    if get_opt('HTMLCOMP_PRESERVE_COMMENTS'):
+        cmd.append('--preserve-comments')
+
+    if is_xml and get_opt('HTMLCOMP_PRESERVE_INTERTAG_SPACES'):
+        cmd.append('--preserve-intertag-spaces')
+    elif not is_xml and not get_opt('HTMLCOMP_PRESERVE_INTERTAG_SPACES'):
+        cmd.append('--remove-intertag-spaces')
+
+    if not is_xml:
+        if get_opt('HTMLCOMP_PRESERVE_MULTI_SPACES'):
+            cmd.append('--preserve-multi-spaces')
+
+        if get_opt('HTMLCOMP_PRESERVE_LINE_BREAKS'):
+            cmd.append('--preserve-line-breaks')
+
+        if not get_opt('HTMLCOMP_PRESERVE_QUOTES'):
+            cmd.append('--remove-quotes')
+
+        if not get_opt('HTMLCOMP_PRESERVE_DOCTYPE'):
+            cmd.append('--simple-doctype')
+
+        if not get_opt('HTMLCOMP_PRESERVE_TYPE_ATTRS'):
+            cmd.extend(('--remove-style-attr',
+                        '--remove-link-attr',
+                        '--remove-script-attr',
+                        '--remove-form-attr',
+                        '--remove-input-attr'))
+
+        if not get_opt('HTMLCOMP_PRESERVE_BOOL_ATTRS'):
+            cmd.append('--simple-bool-attr')
+
+        if not get_opt('HTMLCOMP_PRESERVE_JS_PROTOCOL'):
+            cmd.append('--remove-js-protocol')
+
+    cmd.append('--closure-opt-level')
+    cmd.append(opt_level_trans.get(env['CLOSURE_COMPILATION_LEVEL'],
+               'simple'))
+
+    cmd.append('"%s"' % source[0])
+    cmd.append('-o "%s"' % target[0])
+
+    return ' '.join(cmd)
+
+BUILDERS['HtmlComp'] = Builder(generator=htmlcomp_generator,
+                               suffix='.min.html', src_suffix='.html',
+                               single_source=True)
+
+DEFAULTS['JAVA'] = 'java'
+DEFAULTS['HTMLCOMP_COMPRESSOR_JAR'] = 'htmlcompressor.jar'
+DEFAULTS['HTMLCOMP_AGGRESSIVE'] = True
+
+DEFAULTS['HTMLCOMP_AGGRESSIVE_OPTIONS'] = {
+    'HTMLCOMP_PRESERVE_INTERTAG_SPACES': False,
+    'HTMLCOMP_PRESERVE_QUOTES': False,
+    'HTMLCOMP_PRESERVE_DOCTYPE': False,
+    'HTMLCOMP_PRESERVE_TYPE_ATTRS': False,
+    'HTMLCOMP_PRESERVE_BOOL_ATTRS': False,
+    'HTMLCOMP_PRESERVE_JS_PROTOCOL': False,
+}
+
+DEFAULTS['HTMLCOMP_SAFE_OPTIONS'] = {
+    'HTMLCOMP_PRESERVE_INTERTAG_SPACES': True,
+    'HTMLCOMP_PRESERVE_QUOTES': True,
+    'HTMLCOMP_PRESERVE_DOCTYPE': True,
+    'HTMLCOMP_PRESERVE_TYPE_ATTRS': True,
+    'HTMLCOMP_PRESERVE_BOOL_ATTRS': True,
+    'HTMLCOMP_PRESERVE_JS_PROTOCOL': True,
+}
+
+DEFAULTS['HTMLCOMP_CHARSET'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_COMMENTS'] = False
+DEFAULTS['HTMLCOMP_PRESERVE_MULTI_SPACES'] = False
+DEFAULTS['HTMLCOMP_PRESERVE_LINE_BREAKS'] = False
+
+DEFAULTS['HTMLCOMP_PRESERVE_INTERTAG_SPACES'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_QUOTES'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_DOCTYPE'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_TYPE_ATTRS'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_BOOL_ATTRS'] = None
+DEFAULTS['HTMLCOMP_PRESERVE_JS_PROTOCOL'] = None
 
 def generate(env):
     env.Append(BUILDERS=BUILDERS, SCANNERS=SCANNERS)
