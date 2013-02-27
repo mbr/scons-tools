@@ -250,7 +250,7 @@ DEFAULTS['UGLIFY_LINT'] = False
 
 
 def closure_generator(source, target, env, for_signature):
-    cmd = [env['CLOSURE_JAVA_CMD'], '-jar', env['CLOSURE_COMPILER_JAR']]
+    cmd = [env['JAVA'], '-jar', env['CLOSURE_COMPILER_JAR']]
 
     if env['CLOSURE_COMPILATION_LEVEL']:
         cmd.append('--compilation_level')
