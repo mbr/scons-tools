@@ -29,7 +29,10 @@ A lot of tools are available for web development, here is an example
   # compile our scripts
   js_files = env.Coffee(Glob('src/coffee/*.coffee'))
 
-  # build assets
+  # compile html to minified html
+  html_files = [env.HtmlComp(fn) for fn in Glob('*.html')]
+
+  # build assets (closure compiler + less for style sheets)
   env.Closure('static/js/app.js', js_files)
   env.Less('static/css/main.css', Glob('src/less/*.less'))
 
