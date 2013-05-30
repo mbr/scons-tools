@@ -49,8 +49,13 @@ def less_scan(node, env, path):
     for fn in LESS_IMPORT_RE.findall(node.get_text_contents()):
         n = SCons.Node.FS.find_file(fn, include_path)
         if n == None:
-            yield env.File(fn)
-            # should trigger a 'not found'
+            # try adding a .less ending
+            n_less = SCons.Node.FS.find_file(fn + '.less', include_path)
+            if n_less:
+              yield n_less
+            else:
+              yield env.File(fn)
+              # should trigger a 'not found'
         else:
             yield n
 
