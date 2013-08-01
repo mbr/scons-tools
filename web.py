@@ -364,6 +364,11 @@ BUILDERS['HtmlComp'] = Builder(generator=htmlcomp_generator,
                                suffix='.min.html', src_suffix='.html',
                                single_source=True)
 
+
+BUILDERS['AngularTemplates'] = Builder(action='ngtpl $SOURCES > $TARGET',
+                                       suffix='.html', src_suffix='.html')
+
+
 DEFAULTS['JAVA'] = 'java'
 DEFAULTS['HTMLCOMP_AGGRESSIVE'] = True
 
