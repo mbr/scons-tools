@@ -365,8 +365,10 @@ BUILDERS['HtmlComp'] = Builder(generator=htmlcomp_generator,
                                single_source=True)
 
 
-BUILDERS['AngularTemplates'] = Builder(action='ngtpl $SOURCES > $TARGET',
+BUILDERS['AngularTemplates'] = Builder(action='ngtpl --wrapper $NGTPL_WRAPPER '
+                                              '$SOURCES > $TARGET',
                                        suffix='.html', src_suffix='.html')
+DEFAULTS['NGTPL_WRAPPER'] = 'html'
 
 
 DEFAULTS['JAVA'] = 'java'
