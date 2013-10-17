@@ -6,7 +6,7 @@ def generate(env):
         'PySideUI': Builder(action='$PYSIDE_UIC $SOURCE > $TARGET',
                             src_suffix='.ui', suffix='.py',
                             single_source=True),
-        'PySideUIMerge': Builder(action='$PYSIDE_UIMERGE $SOURCE > $TARGET')
+        'PySideUIMerge': Builder(action='$PYSIDE_UIMERGE $SOURCES > $TARGET')
     })
     env.SetDefault(PYSIDE_UIC='pyside-uic')
     env.SetDefault(PYSIDE_UIMERGE='cat')
