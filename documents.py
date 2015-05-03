@@ -46,12 +46,35 @@ def generate(env):
                            suffix='.latex',
                            src_suffix='.rst')
 
+    rst_to_pdf = Builder(action=' '.join(
+                         ['rst2pdf',
+                          '--compressed',
+                          # FIXME: should support language options
+                          '--smart-quotes=1',
+                          '>', '$TARGET',
+                          '<', '$SOURCE',
+                          ]),
+                         suffix='.pdf',
+                         src_suffix='.rst')
+
+    dot_to_pdf = Builder(action=' '.join([
+                         'dot',
+                         '-Tpdf',            # output pdf
+                         '-o$TARGET',
+                         '$SOURCE',
+                         ]),
+                         suffix='.pdf',
+                         src_suffix='.dot',
+                         )
+
     env.Append(BUILDERS={
         'PDFMerge': pdf_merge,
         'ImgToPDF': img_to_pdf,
         'SVGToPDF': svg_to_pdf,
         'RST2HTML': rst_to_html,
         'RST2Latex': rst_to_latex,
+        'RST2PDF': rst_to_pdf,
+        'DotPdf': dot_to_pdf,
     })
 
 
