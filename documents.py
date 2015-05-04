@@ -40,9 +40,10 @@ def generate(env):
                            ['rst2latex',
                             '--strict',
                             '--stylesheet=amsfonts,amssymb',
+                            '$RST2LATEXFLAGS',
                             '$SOURCE',
                             '$TARGET',
-                           ]),
+                            ]),
                            suffix='.latex',
                            src_suffix='.rst')
 
