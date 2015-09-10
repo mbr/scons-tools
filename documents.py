@@ -57,6 +57,22 @@ def generate(env):
                          suffix='.pdf',
                          src_suffix='.dot', )
 
+    pdf_to_ps = Builder(action=' '.join([
+        'pdf2ps',
+        '$SOURCE',
+        '$TARGET',
+    ]),
+                        suffix='.ps',
+                        src_suffix='.pdf')
+
+    ps_to_pdf = Builder(action=' '.join([
+        'ps2pdf',
+        '$SOURCE',
+        '$TARGET',
+    ]),
+                        suffix='.pdf',
+                        src_suffix='.ps')
+
     env.Append(BUILDERS={
         'PDFMerge': pdf_merge,
         'ImgToPDF': img_to_pdf,
@@ -65,6 +81,8 @@ def generate(env):
         'RST2Latex': rst_to_latex,
         'RST2PDF': rst_to_pdf,
         'DotPdf': dot_to_pdf,
+        'PDF2PS': pdf_to_ps,
+        'PS2PDF': ps_to_pdf,
     })
 
 
