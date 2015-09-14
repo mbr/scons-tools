@@ -11,7 +11,8 @@ def generate(env):
     # converts a JPEG with the right aspect ration to an A4 PDF page
     img_to_pdf = Builder(action=' '.join(
         ['convert', '$SOURCE', '-units', 'PixelsPerInch', '-density', '150',
-         '-quality', '80', '-resize', '%dx%d' % a4_dim_px, '$TARGET']))
+         '-quality', '80', '-resize', '%dx%d' % a4_dim_px, '$TARGET']),
+                         suffix='.pdf')
 
     # converts an SVG to PDF using inkscape
     svg_to_pdf = Builder(action=' '.join(
